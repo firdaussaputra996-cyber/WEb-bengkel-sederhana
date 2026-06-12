@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Cek rem dan suspensi motor">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#050505"/><stop offset=".58" stop-color="#151515"/><stop offset="1" stop-color="#000"/></linearGradient>
+    <linearGradient id="m" x1="0" x2="1"><stop stop-color="#0066b1"/><stop offset=".52" stop-color="#1c69d4"/><stop offset="1" stop-color="#e22718"/></linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <rect x="86" y="82" width="210" height="10" fill="url(#m)"/>
+  <g fill="none" stroke="#fff" stroke-width="18" stroke-linecap="square" stroke-linejoin="round">
+    <circle cx="266" cy="358" r="70"/>
+    <circle cx="706" cy="358" r="70"/>
+    <path d="M266 358h142l90-116h92l116 116M408 358l-72-128h112l50 12M508 358l-10-116M608 242l48-72h86M692 170l14 188"/>
+  </g>
+  <g fill="none" stroke-linecap="square">
+    <circle cx="706" cy="358" r="42" stroke="#1c69d4" stroke-width="12"/>
+    <path d="M736 210l-64 116M764 222l-64 116" stroke="#bbbbbb" stroke-width="12"/>
+    <path d="M170 178h92l26 46-72 64-72-64z" stroke="#e6e6e6" stroke-width="14"/>
+    <path d="M184 224l30 32 62-70" stroke="#0fa336" stroke-width="12"/>
+  </g>
+  <text x="86" y="468" fill="#fff" font-family="Inter, Arial" font-size="38" font-weight="800" letter-spacing="3">REM & SUSPENSI</text>
+</svg>

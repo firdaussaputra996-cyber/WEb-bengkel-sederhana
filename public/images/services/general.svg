@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Motor service premium">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#050505"/><stop offset=".58" stop-color="#161616"/><stop offset="1" stop-color="#000"/></linearGradient>
+    <linearGradient id="m" x1="0" x2="1"><stop stop-color="#0066b1"/><stop offset=".52" stop-color="#1c69d4"/><stop offset="1" stop-color="#e22718"/></linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <path d="M0 390h960" stroke="#2b2b2b" stroke-width="2"/>
+  <path d="M96 96h180v10H96z" fill="url(#m)"/>
+  <g fill="none" stroke-linecap="square" stroke-linejoin="round">
+    <circle cx="278" cy="354" r="72" stroke="#e6e6e6" stroke-width="18"/>
+    <circle cx="700" cy="354" r="72" stroke="#e6e6e6" stroke-width="18"/>
+    <path d="M278 354h126l88-112h98l110 112M404 354l-64-124h118l38 12M524 354l-34-112M608 242l48-70h78M654 172l46 182M406 230h-86M680 240h80" stroke="#fff" stroke-width="20"/>
+    <path d="M466 210h142" stroke="url(#m)" stroke-width="16"/>
+  </g>
+  <text x="96" y="460" fill="#bbbbbb" font-family="Inter, Arial" font-size="28" font-weight="700" letter-spacing="4">MOTOCARE M SERVICE</text>
+</svg>

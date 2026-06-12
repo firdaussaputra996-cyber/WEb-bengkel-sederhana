@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Diagnosa kelistrikan motor">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#000"/><stop offset=".6" stop-color="#151515"/><stop offset="1" stop-color="#040404"/></linearGradient>
+    <linearGradient id="m" x1="0" x2="1"><stop stop-color="#0066b1"/><stop offset=".52" stop-color="#1c69d4"/><stop offset="1" stop-color="#e22718"/></linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <rect x="90" y="82" width="210" height="10" fill="url(#m)"/>
+  <g fill="none" stroke="#fff" stroke-width="18" stroke-linecap="square" stroke-linejoin="round">
+    <circle cx="260" cy="360" r="70"/>
+    <circle cx="704" cy="360" r="70"/>
+    <path d="M260 360h142l92-118h94l116 118M402 360l-72-130h116l48 12M506 360l-12-118M604 242l52-70h82M694 172l10 188"/>
+  </g>
+  <g fill="none" stroke-linecap="square" stroke-linejoin="round">
+    <path d="M512 96l-88 144h78l-54 146 126-184h-82z" stroke="#1c69d4" stroke-width="16" fill="#0d0d0d"/>
+    <path d="M640 178h94M640 228h66M222 182h104M222 232h64" stroke="#bbbbbb" stroke-width="12"/>
+    <path d="M412 270h168" stroke="#e22718" stroke-width="10"/>
+  </g>
+  <text x="90" y="468" fill="#fff" font-family="Inter, Arial" font-size="38" font-weight="800" letter-spacing="3">KELISTRIKAN</text>
+</svg>

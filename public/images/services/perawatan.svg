@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Tune up motor">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#000"/><stop offset=".55" stop-color="#111"/><stop offset="1" stop-color="#202020"/></linearGradient>
+    <linearGradient id="m" x1="0" x2="1"><stop stop-color="#0066b1"/><stop offset=".5" stop-color="#1c69d4"/><stop offset="1" stop-color="#e22718"/></linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <path d="M0 396h960" stroke="#3c3c3c"/>
+  <path d="M90 82h210v10H90z" fill="url(#m)"/>
+  <g fill="none" stroke="#fff" stroke-width="18" stroke-linecap="square" stroke-linejoin="round">
+    <circle cx="260" cy="356" r="70"/>
+    <circle cx="704" cy="356" r="70"/>
+    <path d="M260 356h140l92-118h94l118 118M400 356l-76-132h116l52 14M500 356l-10-118M596 238l56-72h92M690 166l14 190"/>
+    <path d="M378 210h116" stroke="url(#m)" stroke-width="16"/>
+  </g>
+  <g fill="none" stroke="#bbbbbb" stroke-width="14" stroke-linecap="square">
+    <path d="M145 206l56-56M176 238l58-58"/>
+    <path d="M756 170l54 54M810 170l-54 54"/>
+  </g>
+  <text x="90" y="468" fill="#fff" font-family="Inter, Arial" font-size="38" font-weight="800" letter-spacing="3">TUNE UP INJEKSI</text>
+</svg>

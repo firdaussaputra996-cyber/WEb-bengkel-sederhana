@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Ganti oli motor">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#030303"/><stop offset=".6" stop-color="#161616"/><stop offset="1" stop-color="#000"/></linearGradient>
+    <linearGradient id="m" x1="0" x2="1"><stop stop-color="#0066b1"/><stop offset=".5" stop-color="#1c69d4"/><stop offset="1" stop-color="#e22718"/></linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <rect x="84" y="80" width="190" height="10" fill="url(#m)"/>
+  <g fill="none" stroke="#fff" stroke-width="18" stroke-linecap="square" stroke-linejoin="round">
+    <circle cx="268" cy="358" r="68"/>
+    <circle cx="700" cy="358" r="68"/>
+    <path d="M268 358h138l90-112h92l112 112M406 358l-72-126h112l50 14M506 358l-10-112M602 246l48-68h82M686 178l14 180"/>
+  </g>
+  <g>
+    <path d="M555 105h84l26 46v136H530V151z" fill="#1a1a1a" stroke="#e6e6e6" stroke-width="14"/>
+    <path d="M555 105l58-32h44l-18 32" fill="none" stroke="#e6e6e6" stroke-width="14"/>
+    <path d="M552 184h88" stroke="url(#m)" stroke-width="16"/>
+    <path d="M590 298c32 38 52 66 52 94 0 30-23 52-52 52s-52-22-52-52c0-28 20-56 52-94z" fill="#0d0d0d" stroke="#1c69d4" stroke-width="12"/>
+  </g>
+  <text x="84" y="468" fill="#fff" font-family="Inter, Arial" font-size="38" font-weight="800" letter-spacing="3">GANTI OLI PREMIUM</text>
+</svg>
