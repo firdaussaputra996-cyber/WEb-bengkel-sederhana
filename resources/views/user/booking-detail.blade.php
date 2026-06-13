@@ -36,6 +36,20 @@
                 <div><span>Metode</span><strong>{{ $booking->payment_method ?: '-' }}</strong></div>
                 <div><span>Referensi</span><strong>{{ $booking->payment_reference ?: '-' }}</strong></div>
             </div>
+            @if($booking->payment_method === 'QRIS' && $booking->payment_status !== 'Lunas')
+                <div class="qris-panel">
+                    <div class="qris-code" aria-label="QRIS pembayaran MotoCare">
+                        @for($i = 0; $i < 49; $i++)
+                            <span class="{{ in_array($i, [0,1,2,7,9,10,12,14,16,17,18,21,23,24,27,28,30,32,34,36,38,40,41,42,45,46,48], true) ? 'on' : '' }}"></span>
+                        @endfor
+                    </div>
+                    <div>
+                        <span>QRIS MotoCare</span>
+                        <strong>Rp {{ number_format($booking->estimated_total ?: $booking->service->price, 0, ',', '.') }}</strong>
+                        <small>Kode: {{ $booking->booking_code }}</small>
+                    </div>
+                </div>
+            @endif
             @if($booking->payment_proof)
                 <a class="btn small outline" href="{{ asset('storage/' . $booking->payment_proof) }}" target="_blank" rel="noopener">Lihat Bukti</a>
             @endif
@@ -72,7 +86,7 @@
                     @foreach($booking->selected_addons as $addon)
                         <div>
                             <span>{{ $addon['category'] ?? 'Add-on' }}</span>
-                            <strong>{{ $addon['name'] ?? '-' }} · Rp {{ number_format($addon['price'] ?? 0, 0, ',', '.') }}</strong>
+                            <strong>{{ $addon['name'] ?? '-' }} · {{ $addon['quantity'] ?? 1 }} x Rp {{ number_format($addon['price'] ?? 0, 0, ',', '.') }} = Rp {{ number_format($addon['line_total'] ?? ($addon['price'] ?? 0), 0, ',', '.') }}</strong>
                         </div>
                     @endforeach
                 </div>

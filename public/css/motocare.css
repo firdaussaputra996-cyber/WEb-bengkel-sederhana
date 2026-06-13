@@ -890,9 +890,9 @@ label {
 }
 
 .addon-option {
-    display: flex;
-    grid-template-columns: none;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: auto 1fr 82px;
+    align-items: start;
     gap: 10px;
     margin-bottom: 12px;
 }
@@ -917,6 +917,12 @@ label {
 .addon-option small {
     color: var(--muted);
     font-size: 12px;
+}
+
+.quantity-input {
+    min-height: 36px;
+    padding: 7px 8px;
+    text-align: center;
 }
 
 .total-summary {
@@ -1004,6 +1010,51 @@ label {
 
 .detail-actions {
     justify-content: flex-end;
+}
+
+.qris-panel {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    margin: 18px 0;
+    padding: 16px;
+    border: 1px solid var(--hairline);
+    background: var(--surface-soft);
+}
+
+.qris-code {
+    display: grid;
+    grid-template-columns: repeat(7, 10px);
+    grid-template-rows: repeat(7, 10px);
+    gap: 3px;
+    width: max-content;
+    padding: 10px;
+    background: #fff;
+}
+
+.qris-code span {
+    background: #fff;
+}
+
+.qris-code span.on {
+    background: #000;
+}
+
+.qris-panel span,
+.qris-panel small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.qris-panel strong {
+    display: block;
+    margin: 4px 0;
+    color: var(--ink);
+    font-size: 22px;
 }
 
 .footer {
@@ -1131,6 +1182,11 @@ nav[role="navigation"] span {
 
     .card-photo {
         margin: -18px -18px 18px;
+    }
+
+    .addon-option,
+    .qris-panel {
+        grid-template-columns: 1fr;
     }
 
     .sparepart-feature-media {

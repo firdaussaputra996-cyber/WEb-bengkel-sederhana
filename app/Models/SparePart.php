@@ -53,7 +53,7 @@ class SparePart extends Model
             ->toArray();
     }
 
-    public static function selectedAddons(array $keys): array
+    public static function selectedAddons(array $keys, array $quantities = []): array
     {
         $options = collect(self::groupedOptions())
             ->flatten(1)
@@ -61,7 +61,21 @@ class SparePart extends Model
 
         return collect($keys)
             ->unique()
-            ->map(fn (string $key) => $options->get($key))
+            ->map(function (string $key) use ($options, $quantities) {
+                $option = $options->get($key);
+
+                if (! $option) {
+                    return null;
+                }
+
+                $quantity = max(1, (int) ($quantities[$key] ?? 1));
+                $quantity = $option['stock'] > 0 ? min($quantity, $option['stock']) : $quantity;
+
+                return array_merge($option, [
+                    'quantity' => $quantity,
+                    'line_total' => $option['price'] * $quantity,
+                ]);
+            })
             ->filter()
             ->values()
             ->all();

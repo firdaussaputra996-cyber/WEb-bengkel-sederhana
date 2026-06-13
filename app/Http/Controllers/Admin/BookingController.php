@@ -204,7 +204,7 @@ class BookingController extends Controller
                         $booking->motor_name,
                         $booking->plate_number,
                         $booking->complaint,
-                        collect($booking->selected_addons ?? [])->pluck('name')->implode(', '),
+                        collect($booking->selected_addons ?? [])->map(fn ($addon) => ($addon['name'] ?? '-') . ' x' . ($addon['quantity'] ?? 1))->implode(', '),
                         $booking->status,
                         $booking->payment_status,
                         $booking->payment_method,
@@ -237,6 +237,8 @@ class BookingController extends Controller
             'complaint' => ['required', 'string', 'min:10', 'max:1000'],
             'selected_addons' => ['nullable', 'array'],
             'selected_addons.*' => ['string'],
+            'addon_quantities' => ['nullable', 'array'],
+            'addon_quantities.*' => ['integer', 'min:1', 'max:99'],
             'payment_method' => ['nullable', Rule::in(Booking::PAYMENT_METHODS)],
             'payment_status' => ['required', Rule::in(Booking::PAYMENT_STATUSES)],
             'payment_reference' => ['nullable', 'string', 'max:120'],
@@ -251,8 +253,8 @@ class BookingController extends Controller
     private function totalsFor(Request $request): array
     {
         $service = Service::find($request->integer('service_id'));
-        $selectedAddons = SparePart::selectedAddons($request->input('selected_addons', []));
-        $addonTotal = collect($selectedAddons)->sum('price');
+        $selectedAddons = SparePart::selectedAddons($request->input('selected_addons', []), $request->input('addon_quantities', []));
+        $addonTotal = collect($selectedAddons)->sum('line_total');
 
         return [
             'selected_addons' => $selectedAddons,

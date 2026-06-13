@@ -9,6 +9,10 @@
             ->filter()
             ->all();
         $selectedAddons = old('selected_addons', $storedAddons);
+        $storedQuantities = collect($booking->selected_addons ?? [])
+            ->mapWithKeys(fn ($item) => [\Illuminate\Support\Str::slug(($item['category'] ?? '') . ' ' . ($item['name'] ?? '')) => $item['quantity'] ?? 1])
+            ->all();
+        $selectedQuantities = old('addon_quantities', $storedQuantities);
     @endphp
     <div class="form-grid">
         <label>Pelanggan
@@ -94,6 +98,7 @@
                                 <strong>{{ $item['name'] }}</strong>
                                 <small>Rp {{ number_format($item['price'], 0, ',', '.') }} · Stok {{ $item['stock'] }}</small>
                             </span>
+                            <input class="input compact quantity-input" type="number" name="addon_quantities[{{ $item['key'] }}]" value="{{ $selectedQuantities[$item['key']] ?? 1 }}" min="1" max="{{ max(1, $item['stock']) }}" aria-label="Jumlah {{ $item['name'] }}">
                         </label>
                     @endforeach
                 </div>

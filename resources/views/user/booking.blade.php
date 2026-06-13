@@ -14,6 +14,7 @@
     <form class="panel form-panel" method="POST" action="{{ route('user.booking.store') }}">
         @csrf
         @php($oldAddons = old('selected_addons', $preselectedAddons ?? []))
+        @php($oldQuantities = old('addon_quantities', []))
         <div class="booking-type-summary">
             <div>
                 <span>Jenis Booking</span>
@@ -55,7 +56,7 @@
             <input type="hidden" name="plate_number" value="">
         </div>
         <label>{{ $selectedBookingType === 'Beli Suku Cadang' ? 'Catatan Kebutuhan' : 'Keluhan Motor' }}
-            <textarea class="input textarea" name="complaint" required>{{ old('complaint') }}</textarea>
+            <textarea class="input textarea" name="complaint" @if($selectedBookingType !== 'Beli Suku Cadang') required @endif>{{ old('complaint') }}</textarea>
         </label>
 
         <div class="form-section">
@@ -73,6 +74,7 @@
                                     <strong>{{ $item['name'] }}</strong>
                                     <small>Rp {{ number_format($item['price'], 0, ',', '.') }} · Stok {{ $item['stock'] }}</small>
                                 </span>
+                                <input class="input compact quantity-input" type="number" name="addon_quantities[{{ $item['key'] }}]" value="{{ $oldQuantities[$item['key']] ?? 1 }}" min="1" max="{{ max(1, $item['stock']) }}" data-addon-quantity aria-label="Jumlah {{ $item['name'] }}">
                             </label>
                         @endforeach
                     </div>
@@ -108,13 +110,17 @@
     const rupiah = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
     const serviceSelect = document.querySelector('[data-service-select]');
     const addonInputs = document.querySelectorAll('[data-addon-price]');
+    const quantityInputs = document.querySelectorAll('[data-addon-quantity]');
     const totalTarget = document.querySelector('[data-estimated-total]');
 
     function updateEstimatedTotal() {
         const servicePrice = Number(serviceSelect?.selectedOptions?.[0]?.dataset.price || serviceSelect?.dataset.price || 0);
         const addonTotal = Array.from(addonInputs)
             .filter((input) => input.checked)
-            .reduce((total, input) => total + Number(input.dataset.addonPrice || 0), 0);
+            .reduce((total, input) => {
+                const quantity = Number(input.closest('.addon-option')?.querySelector('[data-addon-quantity]')?.value || 1);
+                return total + (Number(input.dataset.addonPrice || 0) * quantity);
+            }, 0);
 
         if (totalTarget) {
             totalTarget.textContent = rupiah.format(servicePrice + addonTotal);
@@ -123,6 +129,7 @@
 
     serviceSelect?.addEventListener('change', updateEstimatedTotal);
     addonInputs.forEach((input) => input.addEventListener('change', updateEstimatedTotal));
+    quantityInputs.forEach((input) => input.addEventListener('input', updateEstimatedTotal));
     updateEstimatedTotal();
 </script>
 @endpush
