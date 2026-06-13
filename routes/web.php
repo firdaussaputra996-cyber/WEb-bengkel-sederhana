@@ -27,6 +27,8 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     Route::get('/services', [UserDashboardController::class, 'services'])->name('services');
     Route::get('/booking', [UserDashboardController::class, 'createBooking'])->name('booking.create');
     Route::post('/booking', [UserDashboardController::class, 'storeBooking'])->name('booking.store');
+    Route::get('/booking/{booking}', [UserDashboardController::class, 'showBooking'])->name('booking.show');
+    Route::patch('/booking/{booking}/cancel', [UserDashboardController::class, 'cancelBooking'])->name('booking.cancel');
     Route::post('/booking/{booking}/payment-proof', [UserDashboardController::class, 'uploadPaymentProof'])->name('booking.payment-proof');
     Route::get('/history', [UserDashboardController::class, 'history'])->name('history');
     Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');

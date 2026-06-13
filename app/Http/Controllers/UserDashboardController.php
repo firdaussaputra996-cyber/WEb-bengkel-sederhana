@@ -129,6 +129,31 @@ class UserDashboardController extends Controller
         ]);
     }
 
+    public function showBooking(Booking $booking): View
+    {
+        abort_unless($booking->user_id === Auth::id(), 403);
+
+        return view('user.booking-detail', [
+            'booking' => $booking->load('service'),
+        ]);
+    }
+
+    public function cancelBooking(Booking $booking): RedirectResponse
+    {
+        abort_unless($booking->user_id === Auth::id(), 403);
+
+        if ($booking->status !== 'Menunggu') {
+            return back()->with('error', 'Booking hanya bisa dibatalkan saat status masih Menunggu.');
+        }
+
+        $booking->update([
+            'status' => 'Dibatalkan',
+            'admin_note' => trim(($booking->admin_note ? $booking->admin_note . "\n" : '') . 'Dibatalkan oleh pelanggan.'),
+        ]);
+
+        return redirect()->route('user.history')->with('success', 'Booking berhasil dibatalkan.');
+    }
+
     public function uploadPaymentProof(Request $request, Booking $booking): RedirectResponse
     {
         abort_unless($booking->user_id === Auth::id(), 403);

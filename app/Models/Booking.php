@@ -10,7 +10,7 @@ class Booking extends Model
 {
     use HasFactory;
 
-    public const STATUSES = ['Menunggu', 'Diproses', 'Selesai'];
+    public const STATUSES = ['Menunggu', 'Diproses', 'Selesai', 'Dibatalkan'];
     public const BOOKING_TYPES = ['Service', 'Beli Suku Cadang', 'Service + Suku Cadang'];
     public const PAYMENT_METHODS = ['QRIS', 'Transfer Bank', 'E-Wallet'];
     public const PAYMENT_STATUSES = ['Menunggu Pembayaran', 'Menunggu Verifikasi', 'Lunas'];

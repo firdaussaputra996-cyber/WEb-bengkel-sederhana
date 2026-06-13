@@ -690,6 +690,7 @@ label {
 .badge.menunggu { border-color: var(--warning); }
 .badge.diproses { border-color: var(--m-blue-dark); }
 .badge.selesai { border-color: var(--success); }
+.badge.dibatalkan { border-color: var(--m-red); }
 
 .chart-bars {
     display: grid;
@@ -928,6 +929,46 @@ label {
     text-transform: uppercase;
 }
 
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.detail-list {
+    display: grid;
+    gap: 14px;
+}
+
+.detail-list div {
+    display: grid;
+    gap: 4px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.detail-list span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.detail-list strong {
+    color: var(--ink);
+    font-size: 16px;
+}
+
+.detail-upload {
+    margin-top: 18px;
+}
+
+.detail-actions {
+    justify-content: flex-end;
+}
+
 .footer {
     display: flex;
     justify-content: space-between;
@@ -966,7 +1007,8 @@ nav[role="navigation"] span {
     .parts-grid,
     .stats-grid,
     .stats-grid.four,
-    .dashboard-grid {
+    .dashboard-grid,
+    .detail-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
@@ -1030,6 +1072,7 @@ nav[role="navigation"] span {
     .dashboard-grid,
     .form-grid,
     .addon-grid,
+    .detail-grid,
     .sidebar {
         grid-template-columns: 1fr;
     }

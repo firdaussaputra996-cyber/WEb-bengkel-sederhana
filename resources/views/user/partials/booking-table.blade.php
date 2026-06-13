@@ -12,6 +12,7 @@
                 <th>Status</th>
                 @if($showPaymentActions)
                     <th>Aksi Bayar</th>
+                    <th>Detail</th>
                 @endif
             </tr>
         </thead>
@@ -38,10 +39,20 @@
                                 </form>
                             @endif
                         </td>
+                        <td class="actions">
+                            <a class="btn small outline" href="{{ route('user.booking.show', $booking) }}">Detail</a>
+                            @if($booking->status === 'Menunggu')
+                                <form method="POST" action="{{ route('user.booking.cancel', $booking) }}" onsubmit="return confirm('Batalkan booking ini?')">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button class="btn small danger" type="submit">Batal</button>
+                                </form>
+                            @endif
+                        </td>
                     @endif
                 </tr>
             @empty
-                <tr><td colspan="{{ $showPaymentActions ? 8 : 7 }}" class="empty">Belum ada booking.</td></tr>
+                <tr><td colspan="{{ $showPaymentActions ? 9 : 7 }}" class="empty">Belum ada booking.</td></tr>
             @endforelse
         </tbody>
     </table>
