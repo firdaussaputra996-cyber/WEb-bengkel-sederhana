@@ -3,6 +3,13 @@
     @if($method !== 'POST')
         @method($method)
     @endif
+    @php
+        $storedAddons = collect($booking->selected_addons ?? [])
+            ->map(fn ($item) => \Illuminate\Support\Str::slug(($item['category'] ?? '') . ' ' . ($item['name'] ?? '')))
+            ->filter()
+            ->all();
+        $selectedAddons = old('selected_addons', $storedAddons);
+    @endphp
     <div class="form-grid">
         <label>Pelanggan
             <select class="input" name="user_id" required>
@@ -15,6 +22,13 @@
             <select class="input" name="service_id" required>
                 @foreach($services as $service)
                     <option value="{{ $service->id }}" @selected(old('service_id', $booking->service_id ?? '') == $service->id)>{{ $service->name }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label>Jenis Booking
+            <select class="input" name="booking_type" required>
+                @foreach($bookingTypes as $type)
+                    <option value="{{ $type }}" @selected(old('booking_type', $booking->booking_type ?? 'Service') === $type)>{{ $type }}</option>
                 @endforeach
             </select>
         </label>
@@ -37,10 +51,55 @@
                 @endforeach
             </select>
         </label>
+        <label>Status Pembayaran
+            <select class="input" name="payment_status" required>
+                @foreach($paymentStatuses as $paymentStatus)
+                    <option value="{{ $paymentStatus }}" @selected(old('payment_status', $booking->payment_status ?? 'Menunggu Pembayaran') === $paymentStatus)>{{ $paymentStatus }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label>Metode Pembayaran
+            <select class="input" name="payment_method">
+                <option value="">Belum dipilih</option>
+                @foreach($paymentMethods as $methodName)
+                    <option value="{{ $methodName }}" @selected(old('payment_method', $booking->payment_method ?? '') === $methodName)>{{ $methodName }}</option>
+                @endforeach
+            </select>
+        </label>
+        <label>Referensi Pembayaran
+            <input class="input" name="payment_reference" value="{{ old('payment_reference', $booking->payment_reference ?? '') }}">
+        </label>
     </div>
+    @if(! empty($booking?->payment_proof))
+        <div class="proof-panel">
+            <span>Bukti Pembayaran</span>
+            <a class="text-link" href="{{ asset('storage/' . $booking->payment_proof) }}" target="_blank" rel="noopener">Lihat Bukti</a>
+        </div>
+    @endif
     <label>Keluhan
         <textarea class="input textarea" name="complaint" required>{{ old('complaint', $booking->complaint ?? '') }}</textarea>
     </label>
+    <div class="form-section">
+        <div class="panel-head">
+            <h2>OLI & SUKU CADANG</h2>
+        </div>
+        <div class="addon-grid">
+            @foreach($addonGroups as $category => $items)
+                <div class="addon-group">
+                    <h3>{{ $category }}</h3>
+                    @foreach($items as $item)
+                        <label class="addon-option">
+                            <input type="checkbox" name="selected_addons[]" value="{{ $item['key'] }}" @checked(in_array($item['key'], $selectedAddons, true))>
+                            <span>
+                                <strong>{{ $item['name'] }}</strong>
+                                <small>Rp {{ number_format($item['price'], 0, ',', '.') }} · Stok {{ $item['stock'] }}</small>
+                            </span>
+                        </label>
+                    @endforeach
+                </div>
+            @endforeach
+        </div>
+    </div>
     <label>Catatan Admin
         <textarea class="input textarea" name="admin_note">{{ old('admin_note', $booking->admin_note ?? '') }}</textarea>
     </label>

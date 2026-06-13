@@ -4,12 +4,14 @@ use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Http\Controllers\Admin\SparePartController as AdminSparePartController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingController::class)->name('landing');
+Route::get('/spareparts', [LandingController::class, 'spareparts'])->name('spareparts.index');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -25,6 +27,7 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     Route::get('/services', [UserDashboardController::class, 'services'])->name('services');
     Route::get('/booking', [UserDashboardController::class, 'createBooking'])->name('booking.create');
     Route::post('/booking', [UserDashboardController::class, 'storeBooking'])->name('booking.store');
+    Route::post('/booking/{booking}/payment-proof', [UserDashboardController::class, 'uploadPaymentProof'])->name('booking.payment-proof');
     Route::get('/history', [UserDashboardController::class, 'history'])->name('history');
     Route::get('/profile', [UserDashboardController::class, 'profile'])->name('profile');
     Route::put('/profile', [UserDashboardController::class, 'updateProfile'])->name('profile.update');
@@ -33,7 +36,9 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
     Route::resource('services', AdminServiceController::class)->except(['show']);
+    Route::resource('spareparts', AdminSparePartController::class)->except(['show']);
     Route::get('bookings/export/{period}', [AdminBookingController::class, 'export'])->name('bookings.export');
+    Route::patch('bookings/{booking}/payment/verify', [AdminBookingController::class, 'verifyPayment'])->name('bookings.payment.verify');
     Route::patch('bookings/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.status');
     Route::resource('bookings', AdminBookingController::class)->except(['show']);
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');

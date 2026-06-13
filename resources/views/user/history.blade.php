@@ -11,7 +11,7 @@
 </section>
 <section class="section container">
     <div class="panel">
-        @include('user.partials.booking-table', ['bookings' => $bookings])
+        @include('user.partials.booking-table', ['bookings' => $bookings, 'showPaymentActions' => true])
         {{ $bookings->links() }}
     </div>
 </section>

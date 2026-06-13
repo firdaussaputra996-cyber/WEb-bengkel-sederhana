@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Service;
+use App\Models\SparePart;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class UserDashboardController extends Controller
@@ -26,14 +29,56 @@ class UserDashboardController extends Controller
 
     public function createBooking(Request $request): View
     {
+        $selectedBookingType = $this->selectedBookingType($request);
+
+        if (! $selectedBookingType && ! $request->filled('service_id')) {
+            return view('user.booking-options', [
+                'options' => [
+                    [
+                        'title' => 'Service Motor',
+                        'type' => 'service',
+                        'description' => 'Booking jadwal service rutin, tune up, CVT, rem, kelistrikan, atau perbaikan lain.',
+                    ],
+                    [
+                        'title' => 'Beli Suku Cadang',
+                        'type' => 'sparepart',
+                        'description' => 'Pesan oli atau sparepart dulu, lalu ambil atau pasang di bengkel sesuai jadwal.',
+                    ],
+                    [
+                        'title' => 'Service + Beli',
+                        'type' => 'bundle',
+                        'description' => 'Service motor sekaligus pilih oli atau sparepart yang ingin disiapkan.',
+                    ],
+                ],
+            ]);
+        }
+
+        $selectedBookingType ??= 'Service';
+
         $selectedServiceId = Service::where('is_active', true)
             ->whereKey($request->integer('service_id'))
             ->value('id');
 
+        if ($selectedBookingType === 'Beli Suku Cadang') {
+            $selectedServiceId = Service::where('is_active', true)
+                ->where('name', 'Pembelian Suku Cadang')
+                ->value('id');
+        }
+
+        $serviceOptions = Service::where('is_active', true)
+            ->where('category', '!=', 'Sparepart')
+            ->orderBy('name')
+            ->get();
+
         return view('user.booking', [
-            'services' => Service::where('is_active', true)->orderBy('name')->get(),
+            'services' => $serviceOptions,
             'profile' => Auth::user()->profile,
             'selectedServiceId' => $selectedServiceId,
+            'selectedBookingType' => $selectedBookingType,
+            'preselectedAddons' => $request->filled('addon') ? [$request->query('addon')] : [],
+            'bookingTypes' => Booking::BOOKING_TYPES,
+            'paymentMethods' => Booking::PAYMENT_METHODS,
+            'addonGroups' => SparePart::groupedOptions(),
         ]);
     }
 
@@ -41,19 +86,40 @@ class UserDashboardController extends Controller
     {
         $data = $request->validate([
             'service_id' => ['required', 'exists:services,id'],
+            'booking_type' => ['required', Rule::in(Booking::BOOKING_TYPES)],
             'service_date' => ['required', 'date', 'after_or_equal:today'],
             'service_time' => ['nullable', 'date_format:H:i'],
-            'motor_name' => ['required', 'string', 'max:120'],
+            'motor_name' => ['nullable', 'required_unless:booking_type,Beli Suku Cadang', 'string', 'max:120'],
             'plate_number' => ['nullable', 'string', 'max:30'],
             'complaint' => ['required', 'string', 'min:10', 'max:1000'],
+            'selected_addons' => ['nullable', 'array'],
+            'selected_addons.*' => ['string'],
+            'payment_method' => ['required', Rule::in(Booking::PAYMENT_METHODS)],
+            'payment_reference' => ['nullable', 'string', 'max:120'],
         ]);
 
+        if ($data['booking_type'] === 'Beli Suku Cadang' && empty($data['selected_addons'])) {
+            return back()
+                ->withErrors(['selected_addons' => 'Pilih minimal satu oli atau suku cadang untuk booking pembelian.'])
+                ->withInput();
+        }
+
+        $service = Service::findOrFail($data['service_id']);
+        $selectedAddons = SparePart::selectedAddons($data['selected_addons'] ?? []);
+        $addonTotal = collect($selectedAddons)->sum('price');
+
+        $data['selected_addons'] = $selectedAddons;
+        $data['addon_total'] = $addonTotal;
+        $data['estimated_total'] = $service->price + $addonTotal;
+        $data['payment_status'] = 'Menunggu Pembayaran';
+        $data['motor_name'] = $data['motor_name'] ?: 'Pembelian Suku Cadang';
+        $data['plate_number'] = null;
         $data['user_id'] = Auth::id();
         $data['booking_code'] = 'MC-' . now()->format('ymd') . '-' . str_pad((string) (Booking::count() + 1), 4, '0', STR_PAD_LEFT);
 
         Booking::create($data);
 
-        return redirect()->route('user.history')->with('success', 'Booking service berhasil dibuat.');
+        return redirect()->route('user.history')->with('success', 'Booking berhasil dibuat. Silakan lakukan pembayaran online sesuai metode yang dipilih.');
     }
 
     public function history(): View
@@ -63,10 +129,33 @@ class UserDashboardController extends Controller
         ]);
     }
 
+    public function uploadPaymentProof(Request $request, Booking $booking): RedirectResponse
+    {
+        abort_unless($booking->user_id === Auth::id(), 403);
+
+        $data = $request->validate([
+            'payment_proof' => ['required', 'image', 'max:2048'],
+        ]);
+
+        if ($booking->payment_proof) {
+            Storage::disk('public')->delete($booking->payment_proof);
+        }
+
+        $booking->update([
+            'payment_proof' => $data['payment_proof']->store('payment-proofs', 'public'),
+            'payment_status' => 'Menunggu Verifikasi',
+        ]);
+
+        return back()->with('success', 'Bukti pembayaran berhasil diupload. Admin akan memverifikasi pembayaran.');
+    }
+
     public function services(): View
     {
         return view('user.services', [
-            'services' => Service::where('is_active', true)->latest()->paginate(9),
+            'services' => Service::where('is_active', true)
+                ->where('category', '!=', 'Sparepart')
+                ->latest()
+                ->paginate(9),
         ]);
     }
 
@@ -95,5 +184,15 @@ class UserDashboardController extends Controller
         );
 
         return back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    private function selectedBookingType(Request $request): ?string
+    {
+        return match ($request->query('type')) {
+            'service' => 'Service',
+            'sparepart' => 'Beli Suku Cadang',
+            'bundle' => 'Service + Suku Cadang',
+            default => in_array($request->query('type'), Booking::BOOKING_TYPES, true) ? $request->query('type') : null,
+        };
     }
 }

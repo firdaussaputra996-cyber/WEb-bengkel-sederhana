@@ -337,6 +337,85 @@ body.loaded .loader {
     margin-top: 18px;
 }
 
+.sparepart-feature {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, .95fr);
+    gap: 32px;
+    align-items: center;
+}
+
+.sparepart-feature-media {
+    min-height: 420px;
+    background:
+        linear-gradient(90deg, rgba(0,0,0,.08), rgba(0,0,0,.2)),
+        url("/images/spareparts/png-transparent-honda-motor-company-car-atlas-honda-motorcycle-spare-part-motorcycle-parts-car-motorcycle-engine.png") center/contain no-repeat,
+        url("/images/services/oli.webp") center/cover;
+    background-color: var(--surface-card);
+    border: 1px solid var(--hairline);
+}
+
+.sparepart-feature-copy h2 {
+    margin: 0;
+    color: var(--ink);
+    font-size: clamp(32px, 4vw, 56px);
+    line-height: 1.02;
+    text-transform: uppercase;
+}
+
+.sparepart-feature-copy p {
+    color: var(--body-strong);
+}
+
+.sparepart-hero {
+    background:
+        linear-gradient(90deg, rgba(0,0,0,.95), rgba(0,0,0,.55)),
+        url("/images/spareparts/png-transparent-honda-motor-company-car-atlas-honda-motorcycle-spare-part-motorcycle-parts-car-motorcycle-engine.png") center/cover,
+        url("/images/services/oli.webp") center/cover;
+}
+
+.parts-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 56px;
+}
+
+.part-card {
+    display: grid;
+    min-height: 220px;
+    align-content: space-between;
+    gap: 18px;
+    padding: 20px;
+    background: var(--surface-card);
+    border: 1px solid var(--hairline);
+}
+
+.part-card h3 {
+    margin: 0;
+    color: var(--ink);
+    font-size: 20px;
+    line-height: 1.25;
+    text-transform: uppercase;
+}
+
+.part-card strong {
+    color: var(--ink);
+    font-size: 22px;
+}
+
+.part-card-meta {
+    display: grid;
+    gap: 4px;
+}
+
+.part-card-meta span {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
 .photo-band {
     min-height: 440px;
     display: flex;
@@ -696,6 +775,159 @@ label {
     width: 100%;
 }
 
+.booking-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.booking-choice-card {
+    display: flex;
+    min-height: 330px;
+    flex-direction: column;
+}
+
+.booking-choice-card p {
+    flex: 1;
+}
+
+.booking-type-summary,
+.readonly-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+    padding: 16px;
+    border: 1px solid var(--hairline);
+    background: var(--surface-soft);
+}
+
+.readonly-field {
+    min-height: 48px;
+    margin-bottom: 16px;
+}
+
+.booking-type-summary span,
+.readonly-field span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.booking-type-summary strong,
+.readonly-field strong {
+    display: block;
+    color: var(--ink);
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.form-section {
+    margin: 8px 0 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--hairline);
+}
+
+.addon-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.addon-group {
+    padding: 16px;
+    background: var(--surface-soft);
+    border: 1px solid var(--hairline);
+}
+
+.addon-group h3 {
+    margin: 0 0 12px;
+    color: var(--ink);
+    font-size: 15px;
+    text-transform: uppercase;
+}
+
+.addon-option {
+    display: flex;
+    grid-template-columns: none;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.addon-option input {
+    margin-top: 4px;
+    accent-color: var(--m-blue-dark);
+}
+
+.addon-option strong,
+.addon-option small,
+.total-summary strong,
+.total-summary span {
+    display: block;
+}
+
+.addon-option strong {
+    color: var(--body-strong);
+    font-size: 14px;
+}
+
+.addon-option small {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.total-summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 0 18px;
+    padding: 18px;
+    border: 1px solid var(--hairline);
+    background: var(--surface-soft);
+}
+
+.total-summary span {
+    color: var(--body);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.total-summary strong {
+    color: var(--ink);
+    font-size: 24px;
+}
+
+.proof-upload {
+    display: grid;
+    gap: 8px;
+    min-width: 220px;
+}
+
+.proof-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 0 18px;
+    padding: 16px;
+    border: 1px solid var(--hairline);
+    background: var(--surface-soft);
+}
+
+.proof-panel span {
+    color: var(--body-strong);
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
 .footer {
     display: flex;
     justify-content: space-between;
@@ -730,10 +962,16 @@ nav[role="navigation"] span {
 
 @media (max-width: 1024px) {
     .card-grid,
+    .booking-choice-grid,
+    .parts-grid,
     .stats-grid,
     .stats-grid.four,
     .dashboard-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sparepart-feature {
+        grid-template-columns: 1fr;
     }
 
     .shell {
@@ -785,10 +1023,13 @@ nav[role="navigation"] span {
     }
 
     .card-grid,
+    .booking-choice-grid,
+    .parts-grid,
     .stats-grid,
     .stats-grid.four,
     .dashboard-grid,
     .form-grid,
+    .addon-grid,
     .sidebar {
         grid-template-columns: 1fr;
     }
@@ -810,6 +1051,10 @@ nav[role="navigation"] span {
 
     .card-photo {
         margin: -18px -18px 18px;
+    }
+
+    .sparepart-feature-media {
+        min-height: 260px;
     }
 
     .shell,

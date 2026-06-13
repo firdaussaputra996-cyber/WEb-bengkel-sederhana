@@ -25,11 +25,13 @@
 
         <nav class="nav-menu" data-nav-menu>
             <a href="{{ route('landing') }}">Home</a>
+            <a href="{{ route('spareparts.index') }}">Suku Cadang</a>
             @auth
                 @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.dashboard') }}">Dashboard</a>
                     <a href="{{ route('admin.bookings.index') }}">Booking</a>
                     <a href="{{ route('admin.services.index') }}">Service</a>
+                    <a href="{{ route('admin.spareparts.index') }}">Suku Cadang</a>
                     <a href="{{ route('admin.customers.index') }}">Pelanggan</a>
                 @else
                     <a href="{{ route('user.dashboard') }}">Dashboard</a>
@@ -58,6 +60,7 @@
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
                 <a href="{{ route('admin.bookings.index') }}" class="{{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">Data Booking</a>
                 <a href="{{ route('admin.services.index') }}" class="{{ request()->routeIs('admin.services.*') ? 'active' : '' }}">Data Service</a>
+                <a href="{{ route('admin.spareparts.index') }}" class="{{ request()->routeIs('admin.spareparts.*') ? 'active' : '' }}">Suku Cadang</a>
                 <a href="{{ route('admin.customers.index') }}" class="{{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">Pelanggan</a>
             </aside>
             <main class="content-panel">
@@ -86,5 +89,6 @@
         });
         window.addEventListener('load', () => document.body.classList.add('loaded'));
     </script>
+    @stack('scripts')
 </body>
 </html>

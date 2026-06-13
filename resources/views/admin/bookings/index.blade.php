@@ -31,7 +31,7 @@
     <div class="table-wrap">
         <table class="data-table">
             <thead>
-                <tr><th>Kode</th><th>User</th><th>Layanan</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr>
+                <tr><th>Kode</th><th>User</th><th>Layanan</th><th>Tanggal</th><th>Total</th><th>Pembayaran</th><th>Bukti</th><th>Status</th><th>Aksi</th></tr>
             </thead>
             <tbody>
                 @forelse($bookings as $booking)
@@ -40,6 +40,22 @@
                         <td>{{ $booking->user->name }}</td>
                         <td>{{ $booking->service->name }}</td>
                         <td>{{ $booking->service_date->format('d M Y') }}</td>
+                        <td>Rp {{ number_format($booking->estimated_total ?: $booking->service->price, 0, ',', '.') }}</td>
+                        <td>{{ $booking->payment_status ?? 'Menunggu Pembayaran' }}</td>
+                        <td>
+                            @if($booking->payment_proof)
+                                <a class="text-link" href="{{ asset('storage/' . $booking->payment_proof) }}" target="_blank" rel="noopener">Lihat</a>
+                                @if($booking->payment_status !== 'Lunas')
+                                    <form method="POST" action="{{ route('admin.bookings.payment.verify', $booking) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button class="btn small outline" type="submit">Verifikasi</button>
+                                    </form>
+                                @endif
+                            @else
+                                <span class="caption">Belum ada</span>
+                            @endif
+                        </td>
                         <td>
                             <form method="POST" action="{{ route('admin.bookings.status', $booking) }}">
                                 @csrf
@@ -61,7 +77,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="empty">Data tidak ditemukan.</td></tr>
+                    <tr><td colspan="9" class="empty">Data tidak ditemukan.</td></tr>
                 @endforelse
             </tbody>
         </table>

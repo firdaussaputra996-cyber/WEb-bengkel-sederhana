@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\ServiceNotification;
 use App\Models\Service;
+use App\Models\SparePart;
 use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
@@ -41,6 +42,10 @@ class BookingController extends Controller
             'users' => User::where('role', 'user')->orderBy('name')->get(),
             'services' => Service::orderBy('name')->get(),
             'statuses' => Booking::STATUSES,
+            'bookingTypes' => Booking::BOOKING_TYPES,
+            'paymentMethods' => Booking::PAYMENT_METHODS,
+            'paymentStatuses' => Booking::PAYMENT_STATUSES,
+            'addonGroups' => SparePart::groupedOptions(),
         ]);
     }
 
@@ -61,6 +66,10 @@ class BookingController extends Controller
             'users' => User::where('role', 'user')->orderBy('name')->get(),
             'services' => Service::orderBy('name')->get(),
             'statuses' => Booking::STATUSES,
+            'bookingTypes' => Booking::BOOKING_TYPES,
+            'paymentMethods' => Booking::PAYMENT_METHODS,
+            'paymentStatuses' => Booking::PAYMENT_STATUSES,
+            'addonGroups' => SparePart::groupedOptions(),
         ]);
     }
 
@@ -93,6 +102,13 @@ class BookingController extends Controller
         $this->notifyIfServiceDone($booking->fresh(['user', 'service']), $oldStatus);
 
         return back()->with('success', 'Status booking diperbarui.');
+    }
+
+    public function verifyPayment(Booking $booking): RedirectResponse
+    {
+        $booking->update(['payment_status' => 'Lunas']);
+
+        return back()->with('success', 'Pembayaran booking berhasil diverifikasi lunas.');
     }
 
     public function export(Request $request, string $period): StreamedResponse
@@ -129,17 +145,33 @@ class BookingController extends Controller
                 'Email',
                 'No HP',
                 'Layanan',
+                'Jenis Booking',
                 'Motor',
                 'Plat Nomor',
                 'Keluhan',
+                'Add-on',
                 'Status',
-                'Harga',
+                'Status Pembayaran',
+                'Metode Pembayaran',
+                'Referensi Pembayaran',
+                'Bukti Pembayaran',
+                'Harga Layanan',
+                'Total Add-on',
+                'Estimasi Total',
                 'Catatan Admin',
             ]);
 
             if (! $hasRows) {
                 fputcsv($handle, [
                     $emptyMessage,
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
+                    '',
                     '',
                     '',
                     '',
@@ -168,11 +200,19 @@ class BookingController extends Controller
                         $booking->user->email,
                         $booking->user->profile->phone ?? '-',
                         $booking->service->name,
+                        $booking->booking_type,
                         $booking->motor_name,
                         $booking->plate_number,
                         $booking->complaint,
+                        collect($booking->selected_addons ?? [])->pluck('name')->implode(', '),
                         $booking->status,
+                        $booking->payment_status,
+                        $booking->payment_method,
+                        $booking->payment_reference,
+                        $booking->payment_proof ? asset('storage/' . $booking->payment_proof) : '',
                         $booking->service->price,
+                        $booking->addon_total,
+                        $booking->estimated_total,
                         $booking->admin_note,
                     ]);
                 }
@@ -186,17 +226,39 @@ class BookingController extends Controller
 
     private function validated(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'user_id' => ['required', 'exists:users,id'],
             'service_id' => ['required', 'exists:services,id'],
+            'booking_type' => ['required', Rule::in(Booking::BOOKING_TYPES)],
             'service_date' => ['required', 'date'],
             'service_time' => ['nullable', 'date_format:H:i'],
             'motor_name' => ['required', 'string', 'max:120'],
             'plate_number' => ['nullable', 'string', 'max:30'],
             'complaint' => ['required', 'string', 'min:10', 'max:1000'],
+            'selected_addons' => ['nullable', 'array'],
+            'selected_addons.*' => ['string'],
+            'payment_method' => ['nullable', Rule::in(Booking::PAYMENT_METHODS)],
+            'payment_status' => ['required', Rule::in(Booking::PAYMENT_STATUSES)],
+            'payment_reference' => ['nullable', 'string', 'max:120'],
+            'payment_proof' => ['nullable', 'string', 'max:255'],
             'status' => ['required', Rule::in(Booking::STATUSES)],
             'admin_note' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        return array_merge($data, $this->totalsFor($request));
+    }
+
+    private function totalsFor(Request $request): array
+    {
+        $service = Service::find($request->integer('service_id'));
+        $selectedAddons = SparePart::selectedAddons($request->input('selected_addons', []));
+        $addonTotal = collect($selectedAddons)->sum('price');
+
+        return [
+            'selected_addons' => $selectedAddons,
+            'addon_total' => $addonTotal,
+            'estimated_total' => ($service?->price ?? 0) + $addonTotal,
+        ];
     }
 
     private function notifyIfServiceDone(Booking $booking, string $oldStatus): void

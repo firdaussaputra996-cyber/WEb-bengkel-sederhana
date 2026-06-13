@@ -43,13 +43,42 @@
                     <span>{{ $service->duration_minutes }} menit</span>
                     <strong>Rp {{ number_format($service->price, 0, ',', '.') }}</strong>
                 </div>
-                <a class="btn small outline service-card-action" href="{{ route('user.booking.create', ['service_id' => $service->id]) }}">Booking Layanan</a>
+                @auth
+                    @if(auth()->user()->isAdmin())
+                        <a class="btn small outline service-card-action" href="{{ route('admin.services.edit', $service) }}">Kelola Service</a>
+                    @else
+                        <a class="btn small outline service-card-action" href="{{ route('user.booking.create', ['service_id' => $service->id]) }}">Booking Layanan</a>
+                    @endif
+                @else
+                    <a class="btn small outline service-card-action" href="{{ route('login') }}">Login untuk Booking</a>
+                @endauth
             </article>
         @empty
             <article class="feature-card">
                 <p>Layanan akan tampil setelah admin menambahkan data service.</p>
             </article>
         @endforelse
+    </div>
+</section>
+
+<section class="section container sparepart-feature">
+    <div class="sparepart-feature-media" role="img" aria-label="Pilihan oli dan suku cadang motor"></div>
+    <div class="sparepart-feature-copy">
+        <p class="eyebrow">Parts Counter</p>
+        <h2>SUKU CADANG & OLI TERSEDIA</h2>
+        <p>Pilih oli mesin, busi, kampas rem, filter udara, atau komponen matic yang ingin disiapkan sebelum datang ke bengkel.</p>
+        <div class="hero-actions">
+            <a class="btn primary" href="{{ route('spareparts.index') }}">Lihat Suku Cadang</a>
+            @auth
+                @if(! auth()->user()->isAdmin())
+                    <a class="btn outline" href="{{ route('user.booking.create', ['type' => 'sparepart']) }}">Booking Pembelian</a>
+                @else
+                    <a class="btn outline" href="{{ route('admin.spareparts.index') }}">Kelola Stok</a>
+                @endif
+            @else
+                <a class="btn outline" href="{{ route('login') }}">Login untuk Beli</a>
+            @endauth
+        </div>
     </div>
 </section>
 

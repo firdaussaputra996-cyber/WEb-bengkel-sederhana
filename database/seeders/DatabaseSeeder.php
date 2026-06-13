@@ -44,17 +44,24 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Cek Rem & Suspensi', 'category' => 'Safety', 'duration_minutes' => 60, 'price' => 90000, 'description' => 'Pemeriksaan kampas rem, minyak rem, shockbreaker, bearing, dan kaki-kaki.'],
             ['name' => 'Diagnosa Kelistrikan', 'category' => 'Elektrikal', 'duration_minutes' => 60, 'price' => 105000, 'description' => 'Pengecekan aki, lampu, starter, soket, dan sistem pengisian.'],
             ['name' => 'Turun Mesin', 'category' => 'Mesin', 'duration_minutes' => 480, 'price' => 1500000, 'description' => 'Overhaul mesin menyeluruh untuk pengecekan kompresi, piston, klep, gasket, dan komponen internal.'],
+            ['name' => 'Pembelian Suku Cadang', 'category' => 'Sparepart', 'duration_minutes' => 15, 'price' => 0, 'description' => 'Reservasi pembelian oli atau suku cadang tanpa pekerjaan service utama.'],
         ])->map(fn ($service) => Service::create($service));
 
         Booking::create([
             'booking_code' => 'MC-' . now()->format('ymd') . '-0001',
             'user_id' => $user->id,
             'service_id' => $services->first()->id,
+            'booking_type' => 'Service',
             'service_date' => now()->addDays(2)->toDateString(),
             'service_time' => '09:00',
             'motor_name' => 'Yamaha NMAX 155',
             'plate_number' => 'B 1234 MTR',
             'complaint' => 'Tarikan terasa berat dan mesin agak bergetar saat langsam.',
+            'selected_addons' => [],
+            'addon_total' => 0,
+            'estimated_total' => $services->first()->price,
+            'payment_method' => 'QRIS',
+            'payment_status' => 'Menunggu Pembayaran',
             'status' => 'Menunggu',
         ]);
     }
