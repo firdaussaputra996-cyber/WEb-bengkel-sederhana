@@ -56,6 +56,7 @@ class SparePartController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
             'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
+            'low_stock_threshold' => ['required', 'integer', 'min:0', 'max:999999'],
             'is_active' => ['nullable', 'boolean'],
         ]) + ['is_active' => false];
     }

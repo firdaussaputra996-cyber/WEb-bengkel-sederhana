@@ -21,6 +21,9 @@
 - Manage bookings, service status, schedules, mechanics, and payment information.
 - Verify submitted payment receipts.
 - Manage services, pricing, spare part inventory, and mechanics.
+- Create mechanic login accounts and assign mechanics to bookings.
+- Let assigned mechanics view their work queue, update service progress, and record installed spare parts with quantities.
+- Deduct inventory atomically when parts are recorded as installed, update booking totals, and show configurable low stock alerts on the admin dashboard.
 - Export booking data.
 
 ## Tech Stack
@@ -92,8 +95,9 @@ The database seeder creates these accounts. Both use the password `password`.
 
 1. A customer signs in and selects services to create a booking.
 2. The application validates the selected services and spare part stock, calculates an estimated total, and generates a tracking code.
-3. An administrator manages the booking, updates service progress, and verifies payment when the customer submits a receipt.
-4. The customer checks service progress and history from the dashboard or with the tracking code.
+3. An administrator assigns a mechanic and verifies payment when the customer submits a receipt.
+4. The assigned mechanic updates service progress and records parts used. The application updates stock, totals, and customer notifications.
+5. The customer checks service progress and history from the booking detail page.
 
 ## Project Structure
 

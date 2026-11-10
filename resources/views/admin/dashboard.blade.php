@@ -8,6 +8,20 @@
     <h1>DASHBOARD ADMIN</h1>
 </div>
 
+@if(($lowStockParts ?? collect())->isNotEmpty())
+    <section class="panel" style="margin-top: 1rem; border-color: #d97706;">
+        <div class="panel-head">
+            <h2>PERINGATAN STOK MENIPIS</h2>
+            <a class="text-link" href="{{ route('admin.spareparts.index') }}">Kelola inventaris</a>
+        </div>
+        <div class="detail-list">
+            @foreach($lowStockParts as $part)
+                <div><span>{{ $part->category }} · {{ $part->name }}</span><strong>{{ $part->stock }} tersisa (minimum {{ $part->low_stock_threshold }})</strong></div>
+            @endforeach
+        </div>
+    </section>
+@endif
+
 <div class="stats-grid four">
     <div class="spec-cell"><strong>{{ $usersCount }}</strong><span>Jumlah User</span></div>
     <div class="spec-cell"><strong>{{ $bookingsCount }}</strong><span>Total Booking</span></div>

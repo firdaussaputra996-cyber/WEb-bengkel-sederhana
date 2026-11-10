@@ -16,6 +16,9 @@
         <label>Stok
             <input class="input" type="number" name="stock" value="{{ old('stock', $sparePart->stock ?? 0) }}" required>
         </label>
+        <label>Batas Stok Minimum
+            <input class="input" type="number" min="0" name="low_stock_threshold" value="{{ old('low_stock_threshold', $sparePart->low_stock_threshold ?? 5) }}" required>
+        </label>
     </div>
     <label>Deskripsi
         <textarea class="input textarea" name="description">{{ old('description', $sparePart->description ?? '') }}</textarea>
