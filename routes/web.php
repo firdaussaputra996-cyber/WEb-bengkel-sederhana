@@ -5,8 +5,10 @@ use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\SparePartController as AdminSparePartController;
+use App\Http\Controllers\Admin\MechanicController as AdminMechanicController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\MechanicDashboardController;
 use App\Http\Controllers\UserDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,9 +41,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
     Route::resource('services', AdminServiceController::class)->except(['show']);
     Route::resource('spareparts', AdminSparePartController::class)->except(['show']);
+    Route::get('mechanics', [AdminMechanicController::class, 'index'])->name('mechanics.index');
+    Route::post('mechanics', [AdminMechanicController::class, 'store'])->name('mechanics.store');
     Route::get('bookings/export/{period}', [AdminBookingController::class, 'export'])->name('bookings.export');
+    Route::post('bookings/{booking}/spare-parts', [AdminBookingController::class, 'recordSparePartUsage'])->name('bookings.spare-parts');
     Route::patch('bookings/{booking}/payment/verify', [AdminBookingController::class, 'verifyPayment'])->name('bookings.payment.verify');
     Route::patch('bookings/{booking}/status', [AdminBookingController::class, 'updateStatus'])->name('bookings.status');
     Route::resource('bookings', AdminBookingController::class)->except(['show']);
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
+});
+
+Route::middleware(['auth', 'role:mechanic'])->prefix('mechanic')->name('mechanic.')->group(function () {
+    Route::get('/dashboard', [MechanicDashboardController::class, 'index'])->name('dashboard');
+    Route::patch('/bookings/{booking}/status', [MechanicDashboardController::class, 'updateStatus'])->name('bookings.status');
+    Route::post('/bookings/{booking}/spare-parts', [AdminBookingController::class, 'recordSparePartUsage'])->name('bookings.spare-parts');
 });

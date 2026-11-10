@@ -16,6 +16,7 @@ class SparePart extends Model
         'description',
         'price',
         'stock',
+        'low_stock_threshold',
         'is_active',
     ];
 
@@ -24,6 +25,7 @@ class SparePart extends Model
         return [
             'price' => 'decimal:2',
             'stock' => 'integer',
+            'low_stock_threshold' => 'integer',
             'is_active' => 'boolean',
         ];
     }

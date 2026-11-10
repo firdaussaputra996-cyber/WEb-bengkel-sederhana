@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Booking extends Model
 {
@@ -32,6 +33,7 @@ class Booking extends Model
     protected $fillable = [
         'booking_code',
         'user_id',
+        'mechanic_id',
         'service_id',
         'booking_type',
         'service_date',
@@ -98,5 +100,15 @@ class Booking extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    public function mechanic(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'mechanic_id');
+    }
+
+    public function sparePartUsages(): HasMany
+    {
+        return $this->hasMany(SparePartUsage::class);
     }
 }

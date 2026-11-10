@@ -60,6 +60,12 @@
                             <form method="POST" action="{{ route('admin.bookings.status', $booking) }}">
                                 @csrf
                                 @method('PATCH')
+                                <select class="input compact" name="mechanic_id" onchange="this.form.submit()">
+                                    <option value="">Belum ditugaskan</option>
+                                    @foreach($mechanics as $mechanic)
+                                        <option value="{{ $mechanic->id }}" @selected($booking->mechanic_id === $mechanic->id)>{{ $mechanic->name }}</option>
+                                    @endforeach
+                                </select>
                                 <select class="input compact" name="status" onchange="this.form.submit()">
                                     @foreach($statuses as $status)
                                         <option value="{{ $status }}" @selected($booking->status === $status)>{{ $status }}</option>

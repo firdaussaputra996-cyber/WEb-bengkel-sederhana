@@ -15,7 +15,7 @@
     <div class="table-wrap">
         <table class="data-table">
             <thead>
-                <tr><th>Nama</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Status</th><th>Aksi</th></tr>
+                <tr><th>Nama</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Batas Minimum</th><th>Status</th><th>Aksi</th></tr>
             </thead>
             <tbody>
                 @forelse($spareParts as $part)
@@ -24,6 +24,7 @@
                         <td>{{ $part->category }}</td>
                         <td>Rp {{ number_format($part->price, 0, ',', '.') }}</td>
                         <td>{{ $part->stock }}</td>
+                        <td>{{ $part->low_stock_threshold }}</td>
                         <td><span class="badge {{ $part->is_active ? 'selesai' : 'menunggu' }}">{{ $part->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
                         <td class="actions">
                             <a class="btn small outline" href="{{ route('admin.spareparts.edit', $part) }}">Edit</a>
@@ -35,7 +36,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="empty">Belum ada suku cadang.</td></tr>
+                    <tr><td colspan="7" class="empty">Belum ada suku cadang.</td></tr>
                 @endforelse
             </tbody>
         </table>

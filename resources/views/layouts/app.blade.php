@@ -33,6 +33,9 @@
                     <a href="{{ route('admin.services.index') }}">Service</a>
                     <a href="{{ route('admin.spareparts.index') }}">Suku Cadang</a>
                     <a href="{{ route('admin.customers.index') }}">Pelanggan</a>
+                    <a href="{{ route('admin.mechanics.index') }}">Mekanik</a>
+                @elseif(auth()->user()->role === 'mechanic')
+                    <a href="{{ route('mechanic.dashboard') }}">Antrean Saya</a>
                 @else
                     <a href="{{ route('user.dashboard') }}">Dashboard</a>
                     <a href="{{ route('user.services') }}">Layanan</a>
@@ -62,6 +65,7 @@
                 <a href="{{ route('admin.services.index') }}" class="{{ request()->routeIs('admin.services.*') ? 'active' : '' }}">Data Service</a>
                 <a href="{{ route('admin.spareparts.index') }}" class="{{ request()->routeIs('admin.spareparts.*') ? 'active' : '' }}">Suku Cadang</a>
                 <a href="{{ route('admin.customers.index') }}" class="{{ request()->routeIs('admin.customers.*') ? 'active' : '' }}">Pelanggan</a>
+                <a href="{{ route('admin.mechanics.index') }}" class="{{ request()->routeIs('admin.mechanics.*') ? 'active' : '' }}">Mekanik</a>
             </aside>
             <main class="content-panel">
                 @include('layouts.flash')

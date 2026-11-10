@@ -31,7 +31,13 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(Auth::user()->isAdmin() ? route('admin.dashboard') : route('user.dashboard'));
+        $target = match (Auth::user()->role) {
+            'admin' => route('admin.dashboard'),
+            'mechanic' => route('mechanic.dashboard'),
+            default => route('user.dashboard'),
+        };
+
+        return redirect()->intended($target);
     }
 
     public function showRegister(): View

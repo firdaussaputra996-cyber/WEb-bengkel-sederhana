@@ -138,7 +138,7 @@ class UserDashboardController extends Controller
         abort_unless($booking->user_id === Auth::id(), 403);
 
         return view('user.booking-detail', [
-            'booking' => $booking->load('service'),
+            'booking' => $booking->load(['service', 'mechanic', 'sparePartUsages.sparePart']),
         ]);
     }
 
@@ -148,6 +148,10 @@ class UserDashboardController extends Controller
 
         if ($booking->status !== 'Menunggu') {
             return back()->with('error', 'Booking hanya bisa dibatalkan saat status masih Menunggu.');
+        }
+
+        if ($booking->sparePartUsages()->exists()) {
+            return back()->with('error', 'Booking tidak dapat dibatalkan karena spare part sudah dicatat terpasang. Hubungi admin bengkel.');
         }
 
         $booking->update([

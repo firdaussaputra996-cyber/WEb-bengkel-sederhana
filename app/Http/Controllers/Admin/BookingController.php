@@ -7,10 +7,13 @@ use App\Models\Booking;
 use App\Models\ServiceNotification;
 use App\Models\Service;
 use App\Models\SparePart;
+use App\Models\SparePartUsage;
 use App\Models\User;
 use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -19,7 +22,7 @@ class BookingController extends Controller
 {
     public function index(Request $request): View
     {
-        $bookings = Booking::with(['user', 'service'])
+        $bookings = Booking::with(['user', 'service', 'mechanic', 'sparePartUsages.sparePart'])
             ->when($request->search, function ($query, $search) {
                 $query->where('booking_code', 'like', "%{$search}%")
                     ->orWhereHas('user', fn ($user) => $user->where('name', 'like', "%{$search}%"))
@@ -33,6 +36,7 @@ class BookingController extends Controller
         return view('admin.bookings.index', [
             'bookings' => $bookings,
             'statuses' => Booking::STATUSES,
+            'mechanics' => User::where('role', 'mechanic')->orderBy('name')->get(),
         ]);
     }
 
@@ -46,6 +50,8 @@ class BookingController extends Controller
             'paymentMethods' => Booking::PAYMENT_METHODS,
             'paymentStatuses' => Booking::PAYMENT_STATUSES,
             'addonGroups' => SparePart::groupedOptions(),
+            'mechanics' => User::where('role', 'mechanic')->orderBy('name')->get(),
+            'spareParts' => SparePart::where('is_active', true)->orderBy('category')->orderBy('name')->get(),
         ]);
     }
 
@@ -70,6 +76,8 @@ class BookingController extends Controller
             'paymentMethods' => Booking::PAYMENT_METHODS,
             'paymentStatuses' => Booking::PAYMENT_STATUSES,
             'addonGroups' => SparePart::groupedOptions(),
+            'mechanics' => User::where('role', 'mechanic')->orderBy('name')->get(),
+            'spareParts' => SparePart::where('is_active', true)->orderBy('category')->orderBy('name')->get(),
         ]);
     }
 
@@ -85,7 +93,13 @@ class BookingController extends Controller
 
     public function destroy(Booking $booking): RedirectResponse
     {
-        $booking->delete();
+        DB::transaction(function () use ($booking): void {
+            $booking->load('sparePartUsages');
+            foreach ($booking->sparePartUsages as $usage) {
+                SparePart::whereKey($usage->spare_part_id)->increment('stock', $usage->quantity);
+            }
+            $booking->delete();
+        });
 
         return back()->with('success', 'Booking berhasil dihapus.');
     }
@@ -94,6 +108,7 @@ class BookingController extends Controller
     {
         $data = $request->validate([
             'status' => ['required', Rule::in(Booking::STATUSES)],
+            'mechanic_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'mechanic')],
         ]);
 
         $oldStatus = $booking->status;
@@ -109,6 +124,78 @@ class BookingController extends Controller
         $booking->update(['payment_status' => 'Lunas']);
 
         return back()->with('success', 'Pembayaran booking berhasil diverifikasi lunas.');
+    }
+
+    public function recordSparePartUsage(Request $request, Booking $booking): RedirectResponse
+    {
+        $mechanicId = null;
+        if ($request->user()?->role === 'mechanic') {
+            abort_unless((int) $booking->mechanic_id === (int) $request->user()->id, 403);
+            $mechanicId = $request->user()->id;
+        }
+
+        $data = $request->validate([
+            'spare_part_id' => ['required', 'exists:spare_parts,id'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:999'],
+        ]);
+
+        DB::transaction(function () use ($booking, $data, $mechanicId): void {
+            $lockedBooking = Booking::whereKey($booking->id)->lockForUpdate()->firstOrFail();
+            abort_unless(! in_array($lockedBooking->status, ['Selesai', 'Dibatalkan'], true), 403);
+            if ($mechanicId !== null) {
+                abort_unless((int) $lockedBooking->mechanic_id === (int) $mechanicId, 403);
+            }
+
+            $part = SparePart::whereKey($data['spare_part_id'])->lockForUpdate()->firstOrFail();
+            $usage = SparePartUsage::where('booking_id', $lockedBooking->id)
+                ->where('spare_part_id', $part->id)
+                ->lockForUpdate()
+                ->first();
+            $oldQuantity = (int) ($usage?->quantity ?? 0);
+            $quantity = (int) $data['quantity'];
+            $stockChange = $quantity - $oldQuantity;
+
+            if ($stockChange > 0 && $part->stock < $stockChange) {
+                throw ValidationException::withMessages([
+                    'quantity' => 'Stok tidak mencukupi. Stok tersedia: '.$part->stock.'.',
+                ]);
+            }
+
+            $unitPrice = (float) ($usage?->unit_price ?? $part->price);
+            if ($stockChange > 0) {
+                $part->decrement('stock', $stockChange);
+            } elseif ($stockChange < 0) {
+                $part->increment('stock', abs($stockChange));
+            }
+
+            $quotedAddon = collect($lockedBooking->selected_addons ?? [])->first(function (array $addon) use ($part): bool {
+                return \Illuminate\Support\Str::slug(($addon['category'] ?? '').' '.($addon['name'] ?? '')) === $part->option_key;
+            });
+            $quoteTotal = (float) ($quotedAddon['line_total'] ?? 0);
+            $costAdjustment = $usage
+                ? ($quantity - $oldQuantity) * $unitPrice
+                : ($quantity * $unitPrice) - $quoteTotal;
+
+            SparePartUsage::updateOrCreate(
+                ['booking_id' => $lockedBooking->id, 'spare_part_id' => $part->id],
+                ['quantity' => $quantity, 'unit_price' => $unitPrice, 'installed_at' => now()],
+            );
+
+            $addonTotal = max(0, (float) $lockedBooking->addon_total + $costAdjustment);
+            $lockedBooking->update([
+                'addon_total' => $addonTotal,
+                'estimated_total' => (float) $lockedBooking->service()->value('price') + $addonTotal,
+            ]);
+
+            ServiceNotification::create([
+                'user_id' => $lockedBooking->user_id,
+                'booking_id' => $lockedBooking->id,
+                'title' => 'Suku cadang servis diperbarui',
+                'message' => "{$quantity} x {$part->name} dicatat terpasang. Estimasi total booking sekarang Rp ".number_format((float) $lockedBooking->estimated_total, 0, ',', '.').'.',
+            ]);
+        });
+
+        return back()->with('success', 'Pemakaian spare part dicatat, stok dan estimasi total diperbarui.');
     }
 
     public function export(Request $request, string $period): StreamedResponse
@@ -228,6 +315,7 @@ class BookingController extends Controller
     {
         $data = $request->validate([
             'user_id' => ['required', 'exists:users,id'],
+            'mechanic_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'mechanic')],
             'service_id' => ['required', 'exists:services,id'],
             'booking_type' => ['required', Rule::in(Booking::BOOKING_TYPES)],
             'service_date' => ['required', 'date'],

@@ -22,6 +22,14 @@
                 @endforeach
             </select>
         </label>
+        <label>Mekanik
+            <select class="input" name="mechanic_id">
+                <option value="">Belum ditugaskan</option>
+                @foreach($mechanics as $mechanic)
+                    <option value="{{ $mechanic->id }}" @selected(old('mechanic_id', $booking->mechanic_id ?? '') == $mechanic->id)>{{ $mechanic->name }} ({{ $mechanic->email }})</option>
+                @endforeach
+            </select>
+        </label>
         <label>Layanan
             <select class="input" name="service_id" required>
                 @foreach($services as $service)

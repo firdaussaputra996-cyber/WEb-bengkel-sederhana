@@ -20,6 +20,7 @@
             </div>
             <div class="detail-list">
                 <div><span>Layanan</span><strong>{{ $booking->service->name }}</strong></div>
+                <div><span>Mekanik</span><strong>{{ $booking->mechanic?->name ?? 'Belum ditugaskan' }}</strong></div>
                 <div><span>Motor</span><strong>{{ $booking->motor_name }}</strong></div>
                 <div><span>Tanggal</span><strong>{{ $booking->service_date->format('d M Y') }}</strong></div>
                 <div><span>Jam</span><strong>{{ $booking->service_time ?: '-' }}</strong></div>
@@ -79,7 +80,7 @@
 
         <article class="panel">
             <div class="panel-head">
-                <h2>OLI & SUKU CADANG</h2>
+                <h2>OLI & SUKU CADANG DIPILIH</h2>
             </div>
             @if(collect($booking->selected_addons ?? [])->isNotEmpty())
                 <div class="detail-list">
@@ -95,6 +96,17 @@
             @endif
         </article>
     </div>
+
+    <article class="panel" style="margin-top: 1rem">
+        <div class="panel-head"><h2>SPARE PART TERPASANG</h2></div>
+        @forelse($booking->sparePartUsages as $usage)
+            <div class="detail-list">
+                <div><span>{{ $usage->sparePart->category }}</span><strong>{{ $usage->sparePart->name }} × {{ $usage->quantity }} · Rp {{ number_format($usage->unit_price * $usage->quantity, 0, ',', '.') }}</strong></div>
+            </div>
+        @empty
+            <p class="caption">Belum ada spare part yang dicatat terpasang.</p>
+        @endforelse
+    </article>
 
     <div class="actions detail-actions">
         <a class="btn outline" href="{{ route('user.history') }}">Kembali</a>
